@@ -6,18 +6,19 @@ const Page = () => {
   const pathname = usePathname();
   const username = pathname.substring(1);
   const [data, setData] = useState({});
-  const searchUser = async () => {
-    try {
-      const response = await axios.post("/api/user", { username });
-      setData(response.data.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  useEffect(() => {
+    const searchUser = async () => {
+      try {
+        const response = await axios.post("/api/user", { username });
+        setData(response.data.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
 
-  searchUser();
-
+    searchUser();
+  }, [username]);
   return (
     <div>
       <h1>User Profile Page</h1>
