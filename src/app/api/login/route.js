@@ -1,5 +1,6 @@
 import { connectDB } from "@/dbConfig/dbConfig";
 import User from "@/models/user.model";
+import useStore from "@/store";
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 connectDB();
@@ -33,6 +34,8 @@ export async function POST(req) {
     const loggedInUser = (await User.findById(user._id)).isSelected(
       "-password -refreshToken"
     );
+    useStore.setState({ user: loggedInUser });
+
     const options = {
       httpOnly: true,
       secure: true,
@@ -42,6 +45,7 @@ export async function POST(req) {
       { status: 200 },
       loggedInUser
     );
+
     response.cookies.set("token", token, options);
     return response;
   } catch (error) {

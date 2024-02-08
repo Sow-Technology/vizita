@@ -20,7 +20,7 @@ export default function SignupPage() {
       setLoading(true);
       const response = await axios.post("/api/signup", user);
       console.log("Signup success", response.data);
-      router.push("/login");
+      router.push("/verifyemail");
     } catch (error) {
       console.log("Axios Error:", error.message);
       toast.error("Internal Server Error", error.messages);

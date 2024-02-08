@@ -20,11 +20,12 @@ export async function POST(req) {
       password,
     });
     const savedUser = await newUser.save();
-    // await sendEmail({
-    //   personalEmail,
-    //   emailType: "VERIFY",
-    //   userId: savedUser._id,
-    // });
+    console.log(personalEmail);
+    await sendEmail({
+      email: personalEmail,
+      emailType: "VERIFY",
+      userId: savedUser._id,
+    });
     return NextResponse.json({
       message: "User created successfully!",
       success: true,
