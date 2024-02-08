@@ -1,20 +1,21 @@
 import nodemailer from "nodemailer";
 import User from "@/models/user.model";
-import bcryptjs from "bcryptjs";
+import generateOTP from "./generateOTP";
 export const sendEmail = async ({ email, emailType, userId }) => {
   try {
-    const hashedToken = await bcryptjs.hash(userId.toString(), 10);
+    // const hashedToken = await bcryptjs.hash(userId.toString(), 10);
+    const otp = generateOTP();
     console.log("Entered  the try block");
     if (emailType === "VERIFY") {
       await User.findByIdAndUpdate(userId, {
-        verifyToken: hashedToken,
-        verifyTokenExpiry: Date.now() + 3600000,
+        verifyToken: otp,
+        verifyTokenExpiry: Date.now() + 7200000,
       });
       console.log("I am at email type  VERIFY");
     } else if (emailType === "RESET") {
       await User.findByIdAndUpdate(userId, {
         forgotPasswordToken: hashedToken,
-        forgotPasswordTokenExpire: Date.now() + 3600000,
+        forgotPasswordTokenExpire: Date.now() + 7200000,
       });
     }
     console.log("out from if block");
@@ -22,6 +23,7 @@ export const sendEmail = async ({ email, emailType, userId }) => {
     console.log(process.env.FROM_EMAIL);
     console.log(process.env.FROM_EMAIL_PASSWORD);
     console.log(process.env.SMTP_PORT);
+    console.log(email);
     const transport = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT),
@@ -37,14 +39,10 @@ export const sendEmail = async ({ email, emailType, userId }) => {
       to: email,
       subject:
         emailType === "VERIFY" ? "Verify your email" : "Reset your password",
-      html: `<p>Click <a href="${
-        process.env.DOMAIN
-      }/verifyemail?token=${hashedToken}">here</a> to ${
+      html: `<p>your otp is ${otp} ${
         emailType === "VERIFY" ? "verify your email" : "reset your password"
       }
-or copy and paste the link below in your browser. <br> ${
-        process.env.DOMAIN
-      }/verifyemail?token=${hashedToken}
+
 </p>`,
     };
     const mailresponse = await transport.sendMail(mailOptions);
